@@ -1,1 +1,29 @@
 @import 'tailwindcss';
+
+@theme {
+  --color-moss-mark: oklch(0.56 0.11 142);
+  --color-ember-signal: oklch(0.58 0.14 38);
+  --color-architectural-white: oklch(1 0 0);
+  --color-mist-surface: oklch(0.97 0.01 142);
+  --color-graphite-ink: oklch(0.23 0.02 152);
+  --color-lichen-muted: oklch(0.52 0.015 152);
+  --color-line-soft: oklch(0.9 0.01 142);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-architectural-white);
+}
+
+body {
+  background: var(--color-architectural-white);
+  color: var(--color-graphite-ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
