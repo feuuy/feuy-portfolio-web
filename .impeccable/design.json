@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-16T00:00:00.000Z",
+  "title": "Design System: FEUY Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "moss-mark": {
+        "role": "primary",
+        "displayName": "Moss Mark",
+        "canonical": "oklch(0.56 0.11 142)",
+        "tonalRamp": [
+          "oklch(0.18 0.04 142)",
+          "oklch(0.26 0.05 142)",
+          "oklch(0.34 0.07 142)",
+          "oklch(0.44 0.09 142)",
+          "oklch(0.56 0.11 142)",
+          "oklch(0.67 0.09 142)",
+          "oklch(0.79 0.06 142)",
+          "oklch(0.91 0.03 142)"
+        ]
+      },
+      "ember-signal": {
+        "role": "secondary",
+        "displayName": "Ember Signal",
+        "canonical": "oklch(0.58 0.14 38)",
+        "tonalRamp": [
+          "oklch(0.18 0.05 38)",
+          "oklch(0.26 0.07 38)",
+          "oklch(0.35 0.09 38)",
+          "oklch(0.46 0.11 38)",
+          "oklch(0.58 0.14 38)",
+          "oklch(0.69 0.11 38)",
+          "oklch(0.81 0.07 38)",
+          "oklch(0.93 0.03 38)"
+        ]
+      },
+      "architectural-white": {
+        "role": "neutral",
+        "displayName": "Architectural White",
+        "canonical": "oklch(1 0 0)",
+        "tonalRamp": [
+          "oklch(0.2 0 0)",
+          "oklch(0.32 0 0)",
+          "oklch(0.44 0 0)",
+          "oklch(0.56 0 0)",
+          "oklch(0.68 0 0)",
+          "oklch(0.8 0 0)",
+          "oklch(0.9 0 0)",
+          "oklch(1 0 0)"
+        ]
+      },
+      "mist-surface": {
+        "role": "neutral",
+        "displayName": "Mist Surface",
+        "canonical": "oklch(0.97 0.01 142)",
+        "tonalRamp": [
+          "oklch(0.2 0.01 142)",
+          "oklch(0.32 0.01 142)",
+          "oklch(0.44 0.01 142)",
+          "oklch(0.58 0.01 142)",
+          "oklch(0.7 0.01 142)",
+          "oklch(0.82 0.01 142)",
+          "oklch(0.9 0.01 142)",
+          "oklch(0.97 0.01 142)"
+        ]
+      },
+      "graphite-ink": {
+        "role": "neutral",
+        "displayName": "Graphite Ink",
+        "canonical": "oklch(0.23 0.02 152)",
+        "tonalRamp": [
+          "oklch(0.15 0.02 152)",
+          "oklch(0.21 0.02 152)",
+          "oklch(0.28 0.02 152)",
+          "oklch(0.38 0.02 152)",
+          "oklch(0.5 0.018 152)",
+          "oklch(0.64 0.015 152)",
+          "oklch(0.78 0.012 152)",
+          "oklch(0.9 0.008 152)"
+        ]
+      },
+      "lichen-muted": {
+        "role": "neutral",
+        "displayName": "Lichen Muted",
+        "canonical": "oklch(0.52 0.015 152)",
+        "tonalRamp": [
+          "oklch(0.18 0.015 152)",
+          "oklch(0.26 0.015 152)",
+          "oklch(0.36 0.015 152)",
+          "oklch(0.45 0.015 152)",
+          "oklch(0.52 0.015 152)",
+          "oklch(0.64 0.013 152)",
+          "oklch(0.78 0.01 152)",
+          "oklch(0.9 0.007 152)"
+        ]
+      },
+      "line-soft": {
+        "role": "neutral",
+        "displayName": "Line Soft",
+        "canonical": "oklch(0.9 0.01 142)",
+        "tonalRamp": [
+          "oklch(0.18 0.01 142)",
+          "oklch(0.28 0.01 142)",
+          "oklch(0.4 0.01 142)",
+          "oklch(0.52 0.01 142)",
+          "oklch(0.66 0.01 142)",
+          "oklch(0.78 0.01 142)",
+          "oklch(0.86 0.01 142)",
+          "oklch(0.9 0.01 142)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headlines and first-impression statements."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section-leading statements and project titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Component titles and structured content group headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Primary reading copy at a calm, high-legibility rhythm."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Metadata and compact UI labels without defaulting to mono styling."
+      }
+    },
+    "shadows": [
+      {
+        "name": "focus-lift",
+        "value": "0 0 0 3px rgba(255,255,255,0.7), 0 0 0 6px rgba(82,130,94,0.35)",
+        "purpose": "Keyboard focus and explicit interaction emphasis."
+      },
+      {
+        "name": "hover-lift",
+        "value": "0 12px 32px rgba(22,32,26,0.08)",
+        "purpose": "Selective hover depth for interactive panels or project previews."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Default easing for hover, focus, and small reveal transitions."
+      },
+      {
+        "name": "duration-fast",
+        "value": "180ms",
+        "purpose": "Control-level transitions."
+      },
+      {
+        "name": "duration-medium",
+        "value": "280ms",
+        "purpose": "Section and container transitions with reduced-motion fallback."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The default action control: compact, calm, and clearly authoritative.",
+      "html": "<button class=\"ds-btn-primary\">Start a conversation</button>",
+      "css": ".ds-btn-primary { background: oklch(0.56 0.11 142); color: oklch(1 0 0); padding: 14px 22px; border: 1px solid transparent; border-radius: 8px; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.95rem; font-weight: 600; line-height: 1; letter-spacing: 0.01em; transition: background 180ms cubic-bezier(0.22, 1, 0.36, 1), transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-primary:hover { background: oklch(0.23 0.02 152); transform: translateY(-1px); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 0 0 6px rgba(82,130,94,0.35); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action treatment for quieter calls to action.",
+      "html": "<button class=\"ds-btn-ghost\">View selected work</button>",
+      "css": ".ds-btn-ghost { background: oklch(1 0 0); color: oklch(0.23 0.02 152); padding: 14px 22px; border: 1px solid oklch(0.9 0.01 142); border-radius: 8px; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.95rem; font-weight: 600; line-height: 1; transition: border-color 180ms cubic-bezier(0.22, 1, 0.36, 1), color 180ms cubic-bezier(0.22, 1, 0.36, 1), background 180ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-ghost:hover { border-color: oklch(0.56 0.11 142); color: oklch(0.56 0.11 142); background: oklch(0.97 0.01 142); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 0 0 6px rgba(82,130,94,0.35); }"
+    },
+    {
+      "name": "Project Preview Card",
+      "kind": "card",
+      "refersTo": "card-default",
+      "description": "A flat-by-default portfolio preview with strong title hierarchy and quiet metadata.",
+      "html": "<article class=\"ds-card\"><p class=\"ds-card-kicker\">Case study</p><h3 class=\"ds-card-title\">Building a quieter portfolio system</h3><p class=\"ds-card-copy\">A focused redesign that improved hierarchy, contrast, and storytelling without falling into portfolio cliches.</p></article>",
+      "css": ".ds-card { background: oklch(0.97 0.01 142); color: oklch(0.23 0.02 152); border: 1px solid oklch(0.9 0.01 142); border-radius: 14px; padding: 24px; transition: box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1), transform 280ms cubic-bezier(0.22, 1, 0.36, 1), border-color 180ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-card:hover { box-shadow: 0 12px 32px rgba(22,32,26,0.08); border-color: rgba(82,130,94,0.25); transform: translateY(-2px); } .ds-card-kicker { margin: 0 0 12px; color: oklch(0.52 0.015 152); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; } .ds-card-title { margin: 0 0 12px; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 1.35rem; font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; text-wrap: balance; } .ds-card-copy { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 1rem; line-height: 1.6; color: oklch(0.52 0.015 152); text-wrap: pretty; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "A quiet, high-contrast input field that uses focus rings rather than loud fill changes.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Email</span><input class=\"ds-input\" type=\"email\" placeholder=\"name@example.com\" /></label>",
+      "css": ".ds-field { display: grid; gap: 8px; color: oklch(0.23 0.02 152); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; } .ds-field-label { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; } .ds-input { width: 100%; background: oklch(1 0 0); color: oklch(0.23 0.02 152); border: 1px solid oklch(0.9 0.01 142); border-radius: 8px; padding: 14px 16px; font: inherit; line-height: 1.4; transition: border-color 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-input::placeholder { color: oklch(0.52 0.015 152); } .ds-input:focus-visible { outline: none; border-color: oklch(0.56 0.11 142); box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 0 0 6px rgba(82,130,94,0.35); }"
+    },
+    {
+      "name": "Primary Navigation",
+      "kind": "nav",
+      "refersTo": "title",
+      "description": "A compact navigation rhythm with one strong active state and no ornamental separators.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-link ds-nav-link-active\" href=\"#\">Work</a><a class=\"ds-nav-link\" href=\"#\">About</a><a class=\"ds-nav-link\" href=\"#\">Contact</a></nav>",
+      "css": ".ds-nav { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; } .ds-nav-link { color: oklch(0.52 0.015 152); text-decoration: none; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.95rem; font-weight: 500; line-height: 1.2; transition: color 180ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-nav-link:hover { color: oklch(0.23 0.02 152); } .ds-nav-link:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.7), 0 0 0 6px rgba(82,130,94,0.35); border-radius: 6px; } .ds-nav-link-active { color: oklch(0.23 0.02 152); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Benchmark",
+    "overview": "This system is built for a portfolio where trust is earned by precision, not by spectacle. The visual language should feel composed on first contact: strong hierarchy, generous white space, and a rare but disciplined use of color that makes the work feel considered instead of trendy. The reference mood is a pure white workspace with a moss-colored signature and a small ember accent that appears only when it matters. The current implementation in code is still a stock Payload starter, so this document defines the intended system the project should converge toward. It rejects generic SaaS scaffolding, metrics-led heroes, default gradients, editorial-serif portfolio mannerisms, and decorative flourishes that make the page feel styled before it feels trustworthy.",
+    "keyCharacteristics": [
+      "Clear, high-contrast hierarchy with little visual noise",
+      "Pure white architecture with restrained tonal surfaces",
+      "Moss as the primary brand signal, ember as the selective counterpoint",
+      "Sans-first typography with confidence carried by scale and spacing",
+      "Flat-by-default surfaces that rely on borders and tone before shadow"
+    ],
+    "rules": [
+      {
+        "name": "The One Accent At A Time Rule",
+        "body": "Moss and ember should almost never compete in the same local component. If a module uses ember, moss steps back to text or outline duty.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Costume Typography Rule",
+        "body": "Do not introduce a serif, mono, or novelty face just to signal taste. Hierarchy must come from scale, spacing, and weight first.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-At-Rest Rule",
+        "body": "If a surface is not being interacted with, it should usually be separated by tone or border, not by ambient shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep body text at oklch(0.23 0.02 152) on oklch(1 0 0) or equivalent contrast-safe pairings.",
+      "Do use moss as the dominant action color and keep ember rare enough to feel intentional.",
+      "Do let spacing and type scale establish authority before adding panels, borders, or effects.",
+      "Do keep long-form text to a readable measure of roughly 65ch to 75ch.",
+      "Do use reduced-motion fallbacks for all non-trivial transitions and entrances."
+    ],
+    "donts": [
+      "Don't ship generic SaaS patterns like metric heroes, templated gradient headers, or interchangeable startup CTA blocks.",
+      "Don't drift into editorial-serif portfolio signals, magazine minimalism, or art-school presentation tropes.",
+      "Don't use side-stripe accents, gradient text, decorative glass cards, or repeated tiny uppercase section eyebrows.",
+      "Don't place moss and ember at equal visual weight inside the same local module unless contrast of meaning demands it.",
+      "Don't default to ambient shadows for every card or section; flat-by-default is part of the system's credibility."
+    ]
+  }
+}
