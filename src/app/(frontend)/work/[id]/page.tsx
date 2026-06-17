@@ -37,6 +37,19 @@ export default async function CaseStudyPage({
     notFound()
   }
 
+  const orderedProjects = await payload.find({
+    collection: 'projects',
+    depth: 0,
+    overrideAccess: false,
+    pagination: false,
+    sort: 'order',
+  })
+
+  const orderedIds = orderedProjects.docs.map((p) => p.id)
+  const currentIndex = orderedIds.indexOf(numericId)
+  const nextProjectId = currentIndex >= 0 ? orderedIds[currentIndex + 1] : undefined
+  const prevProjectId = currentIndex > 0 ? orderedIds[currentIndex - 1] : undefined
+
   const workType = project.workType as string | undefined
   const label = workType ? (workTypeLabels[workType]?.label ?? workType) : ''
 
@@ -167,18 +180,44 @@ export default async function CaseStudyPage({
         </article>
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-line-soft pt-6 text-sm text-lichen-muted">
-          <Link
-            className="underline decoration-line-soft underline-offset-4 transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
-            href="/#work"
-          >
-            Back to Work
-          </Link>
-          <Link
-            className="underline decoration-line-soft underline-offset-4 transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
-            href="/#contact"
-          >
-            Contact
-          </Link>
+          <div className="flex items-center gap-4">
+            {prevProjectId ? (
+              <Link
+                className="underline decoration-line-soft underline-offset-4 transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
+                href={`/work/${prevProjectId}`}
+              >
+                Previous project
+              </Link>
+            ) : (
+              <span className="text-lichen-muted/50">Previous project</span>
+            )}
+          </div>
+          <div className="flex items-center gap-4">
+            <Link
+              className="underline decoration-line-soft underline-offset-4 transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
+              href="/#work"
+            >
+              Back to Work
+            </Link>
+            <Link
+              className="underline decoration-line-soft underline-offset-4 transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
+              href="/#contact"
+            >
+              Contact
+            </Link>
+          </div>
+          <div className="flex items-center gap-4">
+            {nextProjectId ? (
+              <Link
+                className="underline decoration-line-soft underline-offset-4 transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
+                href={`/work/${nextProjectId}`}
+              >
+                Next project
+              </Link>
+            ) : (
+              <span className="text-lichen-muted/50">Next project</span>
+            )}
+          </div>
         </div>
       </main>
 

@@ -435,4 +435,64 @@ describe('API', () => {
       }),
     ).rejects.toThrow()
   })
+
+  it('provides ordered published projects for next and previous navigation', async () => {
+    const previewImage = await createPreviewImage()
+
+    const firstProject = await payload.create({
+      collection: 'projects',
+      data: {
+        _status: 'published',
+        title: 'First Published',
+        workType: 'shipped',
+        previewImage: previewImage.id,
+        order: 1,
+      },
+    })
+
+    const secondProject = await payload.create({
+      collection: 'projects',
+      data: {
+        _status: 'published',
+        title: 'Second Published',
+        workType: 'shipped',
+        previewImage: previewImage.id,
+        order: 2,
+      },
+    })
+
+    const thirdProject = await payload.create({
+      collection: 'projects',
+      data: {
+        _status: 'published',
+        title: 'Third Published',
+        workType: 'speculative',
+        previewImage: previewImage.id,
+        order: 3,
+      },
+    })
+
+    const allProjects = await payload.find({
+      collection: 'projects',
+      depth: 0,
+      overrideAccess: false,
+      pagination: false,
+      sort: 'order',
+    })
+
+    const ids = allProjects.docs.map(({ id }) => id)
+    const firstIndex = ids.indexOf(firstProject.id)
+    const secondIndex = ids.indexOf(secondProject.id)
+    const thirdIndex = ids.indexOf(thirdProject.id)
+
+    expect(firstIndex).toBe(0)
+    expect(secondIndex).toBe(1)
+    expect(thirdIndex).toBe(2)
+
+    const nextProjectId = ids[firstIndex + 1]
+    const prevProjectId = ids[thirdIndex - 1]
+
+    expect(nextProjectId).toBe(secondProject.id)
+    expect(prevProjectId).toBe(secondProject.id)
+  })
 })
