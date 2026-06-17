@@ -358,4 +358,81 @@ describe('API', () => {
     expect(projects.docs[1].workType).toBe('shipped')
     expect(projects.docs[1].previewSummary).toBe('Second homepage preview.')
   })
+
+  it('fetches a published project by id for a case study', async () => {
+    const previewImage = await createPreviewImage()
+
+    const createdProject = await payload.create({
+      collection: 'projects',
+      data: {
+        _status: 'published',
+        title: 'Case Study Project',
+        workType: 'shipped',
+        framingSummary: 'A short opening that explains what this project was trying to address.',
+        roleContext: 'I led the interface design for a shipped internal product tool.',
+        outcome: 'The shipped work improved clarity across the team.',
+        previewImage: previewImage.id,
+        decisions: [
+          {
+            title: 'Reduced the interface to one primary action',
+            explanation: 'The work removed noise from the primary flow.',
+          },
+          {
+            title: 'Paired proof directly with each decision',
+            explanation: 'Each key move is framed with evidence.',
+          },
+        ],
+        order: 1,
+      },
+    })
+
+    const fetchedProject = await payload.findByID({
+      collection: 'projects',
+      id: createdProject.id,
+      depth: 1,
+      overrideAccess: false,
+    })
+
+    expect(fetchedProject.title).toBe('Case Study Project')
+    expect(fetchedProject.workType).toBe('shipped')
+    expect(fetchedProject.framingSummary).toBe(
+      'A short opening that explains what this project was trying to address.',
+    )
+    expect(fetchedProject.roleContext).toBe(
+      'I led the interface design for a shipped internal product tool.',
+    )
+    expect(fetchedProject.outcome).toBe('The shipped work improved clarity across the team.')
+    expect(fetchedProject.decisions).toHaveLength(2)
+    expect(fetchedProject.decisions?.[0]?.title).toBe(
+      'Reduced the interface to one primary action',
+    )
+  })
+
+  it('rejects fetching a draft or missing project publicly', async () => {
+    const draftProject = await payload.create({
+      collection: 'projects',
+      data: {
+        title: 'Draft Case Study',
+        workType: 'shipped',
+        order: 1,
+      },
+      draft: true,
+    })
+
+    await expect(
+      payload.findByID({
+        collection: 'projects',
+        id: draftProject.id,
+        overrideAccess: false,
+      }),
+    ).rejects.toThrow()
+
+    await expect(
+      payload.findByID({
+        collection: 'projects',
+        id: 99999,
+        overrideAccess: false,
+      }),
+    ).rejects.toThrow()
+  })
 })
