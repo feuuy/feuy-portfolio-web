@@ -2,12 +2,49 @@ import { getPayload } from 'payload'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
+import type { Metadata } from 'next'
 
 import config from '@/payload.config'
 
 const workTypeLabels: Record<string, { value: string; label: string }> = {
   shipped: { value: 'shipped', label: 'Shipped' },
   speculative: { value: 'speculative', label: 'Speculative' },
+}
+
+async function getProject(id: number) {
+  const payloadConfig = await config
+  const payload = await getPayload({ config: payloadConfig })
+
+  try {
+    return await payload.findByID({
+      collection: 'projects',
+      id,
+      depth: 1,
+      overrideAccess: false,
+    })
+  } catch {
+    return null
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const project = await getProject(Number(id))
+
+  if (!project) {
+    return { title: 'Not Found' }
+  }
+
+  const description = project.previewSummary ?? project.framingSummary ?? undefined
+
+  return {
+    title: `${project.title} — FEUY Portfolio`,
+    description: description as string | undefined,
+  }
 }
 
 export default async function CaseStudyPage({
@@ -20,18 +57,7 @@ export default async function CaseStudyPage({
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
-  let project
-
-  try {
-    project = await payload.findByID({
-      collection: 'projects',
-      id: numericId,
-      depth: 1,
-      overrideAccess: false,
-    })
-  } catch {
-    notFound()
-  }
+  const project = await getProject(numericId)
 
   if (!project) {
     notFound()

@@ -43,4 +43,23 @@ test.describe('Frontend', () => {
       await expect(page.getByRole('contentinfo')).toBeVisible()
     }
   })
+
+  test('case study page exposes project-specific metadata', async ({ page }) => {
+    await page.goto('http://localhost:3000')
+
+    const viewCaseStudy = page.getByRole('link', { name: 'View case study' }).first()
+
+    if (await viewCaseStudy.isVisible().catch(() => false)) {
+      await viewCaseStudy.click()
+
+      await expect(page).not.toHaveTitle(/FEUY Portfolio$/)
+      await expect(page).toHaveTitle(/ — FEUY Portfolio/)
+    }
+  })
+
+  test('missing project page exposes generic not-found title', async ({ page }) => {
+    await page.goto('http://localhost:3000/work/99999')
+
+    await expect(page).not.toHaveTitle(/ — FEUY Portfolio/)
+  })
 })
