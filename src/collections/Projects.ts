@@ -29,17 +29,54 @@ export const Projects: CollectionConfig = {
         const nextStatus = data?._status ?? originalDoc?._status
         const nextOrder = data?.order ?? originalDoc?.order
         const nextPreviewImage = data?.previewImage ?? originalDoc?.previewImage
+        const nextWorkType = data?.workType ?? originalDoc?.workType
+        const nextPreviewSummary = data?.previewSummary ?? originalDoc?.previewSummary
+        const nextFramingSummary = data?.framingSummary ?? originalDoc?.framingSummary
+        const nextRoleContext = data?.roleContext ?? originalDoc?.roleContext
+        const nextDecisions = data?.decisions ?? originalDoc?.decisions
+        const nextOutcome = data?.outcome ?? originalDoc?.outcome
+        const nextLearning = data?.learning ?? originalDoc?.learning
 
-        if (nextStatus !== PUBLISHED_STATUS || typeof nextOrder !== 'number') {
-          if (nextStatus === PUBLISHED_STATUS && !nextPreviewImage) {
-            throw new Error('Published projects must include a Preview Image.')
-          }
-
+        if (nextStatus !== PUBLISHED_STATUS) {
           return data
         }
 
+        const errors: string[] = []
+
         if (!nextPreviewImage) {
-          throw new Error('Published projects must include a Preview Image.')
+          errors.push('Published projects must include a Preview Image.')
+        }
+
+        if (!nextPreviewSummary) {
+          errors.push('Published projects must include a Preview Summary.')
+        }
+
+        if (!nextFramingSummary) {
+          errors.push('Published projects must include a Framing Summary.')
+        }
+
+        if (!nextRoleContext) {
+          errors.push('Published projects must include a Role Context statement.')
+        }
+
+        if (!nextDecisions || !Array.isArray(nextDecisions) || nextDecisions.length === 0) {
+          errors.push('Published projects must include at least one decision.')
+        }
+
+        if (nextWorkType === 'shipped' && !nextOutcome) {
+          errors.push('Published shipped projects must include an Outcome.')
+        }
+
+        if (nextWorkType === 'speculative' && !nextLearning) {
+          errors.push('Published speculative projects must include a Learning section.')
+        }
+
+        if (typeof nextOrder !== 'number') {
+          errors.push('Published projects must include an Editorial Order.')
+        }
+
+        if (errors.length > 0) {
+          throw new Error(errors[0])
         }
 
         const duplicateProjects = await req.payload.find({

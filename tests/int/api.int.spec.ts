@@ -20,6 +20,41 @@ async function createPreviewImage() {
   })
 }
 
+async function createPublishedProject(
+  overrides: {
+    title?: string
+    workType?: 'shipped' | 'speculative'
+    previewSummary?: string
+    framingSummary?: string
+    roleContext?: string
+    outcome?: string
+    learning?: string
+    decisions?: { title: string; explanation: string; id?: string | null }[]
+    order?: number
+  } = {},
+) {
+  const previewImage = await createPreviewImage()
+
+  return payload.create({
+    collection: 'projects',
+    data: {
+      _status: 'published',
+      title: overrides.title ?? 'Default Published Project',
+      workType: overrides.workType ?? 'shipped',
+      previewImage: previewImage.id,
+      previewSummary: overrides.previewSummary ?? 'Default preview summary.',
+      framingSummary: overrides.framingSummary ?? 'Default framing summary.',
+      roleContext: overrides.roleContext ?? 'Default role context.',
+      outcome: overrides.outcome ?? 'Default outcome.',
+      learning: overrides.learning,
+      decisions: overrides.decisions ?? [
+        { title: 'Default decision', explanation: 'Default explanation.' },
+      ],
+      order: overrides.order,
+    },
+  })
+}
+
 describe('API', () => {
   beforeAll(async () => {
     const payloadConfig = await config
@@ -70,18 +105,7 @@ describe('API', () => {
   })
 
   it('fetches published projects in editorial order', async () => {
-    const previewImage = await createPreviewImage()
-
-    await payload.create({
-      collection: 'projects',
-      data: {
-        _status: 'published',
-        workType: 'shipped',
-        previewImage: previewImage.id,
-        title: 'Second Project',
-        order: 2,
-      },
-    })
+    await createPublishedProject({ title: 'Second Project', order: 2 })
 
     await payload.create({
       collection: 'projects',
@@ -93,16 +117,7 @@ describe('API', () => {
       draft: true,
     })
 
-    await payload.create({
-      collection: 'projects',
-      data: {
-        _status: 'published',
-        workType: 'shipped',
-        previewImage: previewImage.id,
-        title: 'First Project',
-        order: 1,
-      },
-    })
+    await createPublishedProject({ title: 'First Project', order: 1 })
 
     const projects = await payload.find({
       collection: 'projects',
@@ -234,30 +249,10 @@ describe('API', () => {
   })
 
   it('rejects duplicate editorial order for published projects', async () => {
-    const previewImage = await createPreviewImage()
-
-    await payload.create({
-      collection: 'projects',
-      data: {
-        _status: 'published',
-        title: 'First Published Project',
-        workType: 'shipped',
-        order: 1,
-        previewImage: previewImage.id,
-      },
-    })
+    await createPublishedProject({ title: 'First Published Project', order: 1 })
 
     await expect(
-      payload.create({
-        collection: 'projects',
-        data: {
-          _status: 'published',
-          title: 'Second Published Project',
-          workType: 'shipped',
-          order: 1,
-          previewImage: previewImage.id,
-        },
-      }),
+      createPublishedProject({ title: 'Second Published Project', order: 1 }),
     ).rejects.toThrow(/editorial order/i)
   })
 
@@ -315,30 +310,19 @@ describe('API', () => {
   })
 
   it('fetches published projects with the public homepage query shape', async () => {
-    const previewImage = await createPreviewImage()
-
-    await payload.create({
-      collection: 'projects',
-      data: {
-        _status: 'published',
-        title: 'Homepage Project 2',
-        workType: 'shipped',
-        previewSummary: 'Second homepage preview.',
-        previewImage: previewImage.id,
-        order: 2,
-      },
+    await createPublishedProject({
+      title: 'Homepage Project 2',
+      workType: 'shipped',
+      previewSummary: 'Second homepage preview.',
+      order: 2,
     })
 
-    await payload.create({
-      collection: 'projects',
-      data: {
-        _status: 'published',
-        title: 'Homepage Project 1',
-        workType: 'speculative',
-        previewSummary: 'First homepage preview.',
-        previewImage: previewImage.id,
-        order: 1,
-      },
+    await createPublishedProject({
+      title: 'Homepage Project 1',
+      workType: 'speculative',
+      previewSummary: 'First homepage preview.',
+      learning: 'Default learning.',
+      order: 1,
     })
 
     const projects = await payload.find({
@@ -360,30 +344,22 @@ describe('API', () => {
   })
 
   it('fetches a published project by id for a case study', async () => {
-    const previewImage = await createPreviewImage()
-
-    const createdProject = await payload.create({
-      collection: 'projects',
-      data: {
-        _status: 'published',
-        title: 'Case Study Project',
-        workType: 'shipped',
-        framingSummary: 'A short opening that explains what this project was trying to address.',
-        roleContext: 'I led the interface design for a shipped internal product tool.',
-        outcome: 'The shipped work improved clarity across the team.',
-        previewImage: previewImage.id,
-        decisions: [
-          {
-            title: 'Reduced the interface to one primary action',
-            explanation: 'The work removed noise from the primary flow.',
-          },
-          {
-            title: 'Paired proof directly with each decision',
-            explanation: 'Each key move is framed with evidence.',
-          },
-        ],
-        order: 1,
-      },
+    const createdProject = await createPublishedProject({
+      title: 'Case Study Project',
+      framingSummary: 'A short opening that explains what this project was trying to address.',
+      roleContext: 'I led the interface design for a shipped internal product tool.',
+      outcome: 'The shipped work improved clarity across the team.',
+      decisions: [
+        {
+          title: 'Reduced the interface to one primary action',
+          explanation: 'The work removed noise from the primary flow.',
+        },
+        {
+          title: 'Paired proof directly with each decision',
+          explanation: 'Each key move is framed with evidence.',
+        },
+      ],
+      order: 1,
     })
 
     const fetchedProject = await payload.findByID({
@@ -437,39 +413,21 @@ describe('API', () => {
   })
 
   it('provides ordered published projects for next and previous navigation', async () => {
-    const previewImage = await createPreviewImage()
-
-    const firstProject = await payload.create({
-      collection: 'projects',
-      data: {
-        _status: 'published',
-        title: 'First Published',
-        workType: 'shipped',
-        previewImage: previewImage.id,
-        order: 1,
-      },
+    const firstProject = await createPublishedProject({
+      title: 'First Published',
+      order: 1,
     })
 
-    const secondProject = await payload.create({
-      collection: 'projects',
-      data: {
-        _status: 'published',
-        title: 'Second Published',
-        workType: 'shipped',
-        previewImage: previewImage.id,
-        order: 2,
-      },
+    const secondProject = await createPublishedProject({
+      title: 'Second Published',
+      order: 2,
     })
 
-    const thirdProject = await payload.create({
-      collection: 'projects',
-      data: {
-        _status: 'published',
-        title: 'Third Published',
-        workType: 'speculative',
-        previewImage: previewImage.id,
-        order: 3,
-      },
+    const thirdProject = await createPublishedProject({
+      title: 'Third Published',
+      workType: 'speculative',
+      learning: 'Default learning.',
+      order: 3,
     })
 
     const allProjects = await payload.find({
@@ -494,5 +452,132 @@ describe('API', () => {
 
     expect(nextProjectId).toBe(secondProject.id)
     expect(prevProjectId).toBe(secondProject.id)
+  })
+
+  it('rejects a published project without preview summary', async () => {
+    const previewImage = await createPreviewImage()
+
+    await expect(
+      payload.create({
+        collection: 'projects',
+        data: {
+          _status: 'published',
+          title: 'Missing Preview Summary',
+          workType: 'shipped',
+          previewImage: previewImage.id,
+          framingSummary: 'Has framing but no preview.',
+          roleContext: 'Has role context.',
+          outcome: 'Has outcome.',
+          decisions: [{ title: 'A decision', explanation: 'An explanation.' }],
+          order: 1,
+        },
+      }),
+    ).rejects.toThrow(/preview summary/i)
+  })
+
+  it('rejects a published project without framing summary', async () => {
+    const previewImage = await createPreviewImage()
+
+    await expect(
+      payload.create({
+        collection: 'projects',
+        data: {
+          _status: 'published',
+          title: 'Missing Framing Summary',
+          workType: 'shipped',
+          previewImage: previewImage.id,
+          previewSummary: 'Has preview.',
+          roleContext: 'Has role context.',
+          outcome: 'Has outcome.',
+          decisions: [{ title: 'A decision', explanation: 'An explanation.' }],
+          order: 2,
+        },
+      }),
+    ).rejects.toThrow(/framing summary/i)
+  })
+
+  it('rejects a published project without role context', async () => {
+    const previewImage = await createPreviewImage()
+
+    await expect(
+      payload.create({
+        collection: 'projects',
+        data: {
+          _status: 'published',
+          title: 'Missing Role Context',
+          workType: 'shipped',
+          previewImage: previewImage.id,
+          previewSummary: 'Has preview.',
+          framingSummary: 'Has framing.',
+          outcome: 'Has outcome.',
+          decisions: [{ title: 'A decision', explanation: 'An explanation.' }],
+          order: 3,
+        },
+      }),
+    ).rejects.toThrow(/role context/i)
+  })
+
+  it('rejects a published project without at least one decision', async () => {
+    const previewImage = await createPreviewImage()
+
+    await expect(
+      payload.create({
+        collection: 'projects',
+        data: {
+          _status: 'published',
+          title: 'Missing Decisions',
+          workType: 'shipped',
+          previewImage: previewImage.id,
+          previewSummary: 'Has preview.',
+          framingSummary: 'Has framing.',
+          roleContext: 'Has role context.',
+          outcome: 'Has outcome.',
+          decisions: [],
+          order: 4,
+        },
+      }),
+    ).rejects.toThrow(/at least one decision/i)
+  })
+
+  it('rejects a published shipped project without an outcome', async () => {
+    const previewImage = await createPreviewImage()
+
+    await expect(
+      payload.create({
+        collection: 'projects',
+        data: {
+          _status: 'published',
+          title: 'Shipped Without Outcome',
+          workType: 'shipped',
+          previewImage: previewImage.id,
+          previewSummary: 'Has preview.',
+          framingSummary: 'Has framing.',
+          roleContext: 'Has role context.',
+          decisions: [{ title: 'A decision', explanation: 'An explanation.' }],
+          order: 5,
+        },
+      }),
+    ).rejects.toThrow(/outcome/i)
+  })
+
+  it('rejects a published speculative project without learning', async () => {
+    const previewImage = await createPreviewImage()
+
+    await expect(
+      payload.create({
+        collection: 'projects',
+        data: {
+          _status: 'published',
+          title: 'Speculative Without Learning',
+          workType: 'speculative',
+          previewImage: previewImage.id,
+          previewSummary: 'Has preview.',
+          framingSummary: 'Has framing.',
+          roleContext: 'Has role context.',
+          decisions: [{ title: 'A decision', explanation: 'An explanation.' }],
+          order: 6,
+        },
+      }),
+    ).rejects.toThrow(/learning/i)
   })
 })
