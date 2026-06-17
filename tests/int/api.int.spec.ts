@@ -313,4 +313,49 @@ describe('API', () => {
 
     expect(draftProject._status).toBe('draft')
   })
+
+  it('fetches published projects with the public homepage query shape', async () => {
+    const previewImage = await createPreviewImage()
+
+    await payload.create({
+      collection: 'projects',
+      data: {
+        _status: 'published',
+        title: 'Homepage Project 2',
+        workType: 'shipped',
+        previewSummary: 'Second homepage preview.',
+        previewImage: previewImage.id,
+        order: 2,
+      },
+    })
+
+    await payload.create({
+      collection: 'projects',
+      data: {
+        _status: 'published',
+        title: 'Homepage Project 1',
+        workType: 'speculative',
+        previewSummary: 'First homepage preview.',
+        previewImage: previewImage.id,
+        order: 1,
+      },
+    })
+
+    const projects = await payload.find({
+      collection: 'projects',
+      depth: 1,
+      overrideAccess: false,
+      pagination: false,
+      sort: 'order',
+    })
+
+    expect(projects.docs).toHaveLength(2)
+    expect(projects.docs[0].title).toBe('Homepage Project 1')
+    expect(projects.docs[0].workType).toBe('speculative')
+    expect(projects.docs[0].previewSummary).toBe('First homepage preview.')
+    expect(projects.docs[0].previewImage).toBeTruthy()
+    expect(projects.docs[1].title).toBe('Homepage Project 2')
+    expect(projects.docs[1].workType).toBe('shipped')
+    expect(projects.docs[1].previewSummary).toBe('Second homepage preview.')
+  })
 })
