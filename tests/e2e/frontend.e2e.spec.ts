@@ -62,4 +62,65 @@ test.describe('Frontend', () => {
 
     await expect(page).not.toHaveTitle(/ — FEUY Portfolio/)
   })
+
+  test.describe('homepage navigation', () => {
+    test('header work link scrolls to work section', async ({ page }) => {
+      await page.goto('http://localhost:3000')
+
+      await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Work' }).click()
+
+      const workHeading = page.getByRole('heading', { level: 2, name: 'Work' })
+      await expect(workHeading).toBeInViewport()
+    })
+
+    test('header contact link scrolls to contact section', async ({ page }) => {
+      await page.goto('http://localhost:3000')
+
+      await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Contact' }).click()
+
+      const contactHeading = page.getByRole('heading', { level: 2, name: 'Contact' })
+      await expect(contactHeading).toBeInViewport()
+    })
+
+    test('footer navigation links are present', async ({ page }) => {
+      await page.goto('http://localhost:3000')
+
+      const footer = page.getByRole('contentinfo')
+      await expect(footer.getByRole('link', { name: 'Work' })).toBeVisible()
+      await expect(footer.getByRole('link', { name: 'About' })).toBeVisible()
+      await expect(footer.getByRole('link', { name: 'Contact' })).toBeVisible()
+    })
+  })
+
+  test.describe('case study navigation', () => {
+    test('back to work link returns to homepage work section', async ({ page }) => {
+      await page.goto('http://localhost:3000')
+
+      const viewCaseStudy = page.getByRole('link', { name: 'View case study' }).first()
+
+      if (await viewCaseStudy.isVisible().catch(() => false)) {
+        await viewCaseStudy.click()
+
+        const backLink = page.getByRole('link', { name: 'Back to Work' }).first()
+        await backLink.click()
+
+        await expect(page.getByRole('heading', { level: 2, name: 'Work' })).toBeInViewport()
+      }
+    })
+
+    test('contact link routes to homepage contact section', async ({ page }) => {
+      await page.goto('http://localhost:3000')
+
+      const viewCaseStudy = page.getByRole('link', { name: 'View case study' }).first()
+
+      if (await viewCaseStudy.isVisible().catch(() => false)) {
+        await viewCaseStudy.click()
+
+        const contactLink = page.getByRole('link', { name: 'Contact' }).last()
+        await contactLink.click()
+
+        await expect(page.getByRole('heading', { level: 2, name: 'Contact' })).toBeInViewport()
+      }
+    })
+  })
 })
