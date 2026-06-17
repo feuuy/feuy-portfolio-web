@@ -213,9 +213,9 @@ export default async function HomePage() {
             </p>
             <a
               className="mt-6 inline-block text-base font-semibold text-graphite-ink underline decoration-line-soft underline-offset-4 transition-colors hover:text-moss-mark focus-visible:text-moss-mark"
-              href="mailto:hello@example.com"
+              href={`mailto:${process.env.CONTACT_EMAIL ?? 'hello@example.com'}`}
             >
-              hello@example.com
+              {process.env.CONTACT_EMAIL ?? 'hello@example.com'}
             </a>
           </div>
         </section>
@@ -255,9 +255,9 @@ export default async function HomePage() {
         </nav>
         <a
           className="w-fit font-semibold text-graphite-ink underline decoration-line-soft underline-offset-4 transition-colors hover:text-moss-mark focus-visible:text-moss-mark"
-          href="mailto:hello@example.com"
+          href={`mailto:${process.env.CONTACT_EMAIL ?? 'hello@example.com'}`}
         >
-          hello@example.com
+          {process.env.CONTACT_EMAIL ?? 'hello@example.com'}
         </a>
         <p className="m-0 text-sm text-lichen-muted">© 2026 Felicio Orlandini</p>
       </footer>
