@@ -1,6 +1,28 @@
+import { getPayload } from 'payload'
 import React from 'react'
 
+import config from '@/payload.config'
+import Image from 'next/image'
+
 export default async function HomePage() {
+  const payloadConfig = await config
+  const payload = await getPayload({ config: payloadConfig })
+
+  const projects = await payload.find({
+    collection: 'projects',
+    depth: 1,
+    overrideAccess: false,
+    pagination: false,
+    sort: 'order',
+  })
+
+  const publishedProjects = projects.docs
+
+  const workTypeLabels: Record<string, { value: string; label: string }> = {
+    shipped: { value: 'shipped', label: 'Shipped' },
+    speculative: { value: 'speculative', label: 'Speculative' },
+  }
+
   return (
     <div className="bg-architectural-white text-graphite-ink">
       <header
@@ -96,11 +118,64 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="mt-8 rounded-lg border border-line-soft bg-mist-surface p-6 lg:p-8">
-            <p className="max-w-3xl text-base leading-7 text-graphite-ink">
-              Featured Projects will live here next, in strongest-proof-first order.
-            </p>
-          </div>
+          {publishedProjects.length > 0 ? (
+            <ul className="mt-8 space-y-6">
+              {publishedProjects.map((project) => {
+                const previewImage =
+                project.previewImage && typeof project.previewImage === 'object'
+                  ? project.previewImage
+                  : null
+
+              const imageUrl =
+                previewImage && 'url' in previewImage
+                  ? (previewImage.url as string | undefined)
+                  : undefined
+
+              return (
+                <li key={project.id}>
+                  <article
+                    className="grid gap-4 rounded-lg border border-line-soft bg-mist-surface p-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start lg:grid-cols-[minmax(0,1.8fr)_minmax(10rem,1fr)] lg:p-8"
+                    data-testid="project-preview"
+                  >
+                    <div className="flex flex-col gap-3">
+                      <p className="text-sm font-semibold tracking-wide text-moss-mark">
+                        {project.workType && typeof project.workType === 'string'
+                          ? (workTypeLabels[project.workType]?.label ?? project.workType)
+                          : ''}
+                      </p>
+                      <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">
+                        {project.title}
+                      </h3>
+                      <p className="text-base leading-7 text-lichen-muted">
+                        {project.previewSummary ?? ''}
+                      </p>
+                      <div>
+                        <a
+                          className="text-sm font-semibold text-graphite-ink underline decoration-line-soft underline-offset-4 transition-colors hover:text-moss-mark focus-visible:text-moss-mark"
+                          href={`/work/${project.id}`}
+                        >
+                          View case study
+                        </a>
+                      </div>
+                    </div>
+
+                    {imageUrl && (
+                      <div className="relative aspect-video w-full max-w-xs overflow-hidden rounded-sm sm:w-40 lg:w-48">
+                        <Image
+                          alt={previewImage && 'alt' in previewImage ? String(previewImage.alt) : ''}
+                          className="object-cover"
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 160px, 192px"
+                          src={imageUrl}
+                        />
+                      </div>
+                    )}
+                  </article>
+                </li>
+              )
+            })}
+            </ul>
+          ) : null}
         </section>
 
         <section
