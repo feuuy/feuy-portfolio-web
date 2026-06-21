@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { validateProjectPublicationFields } from '@/lib/project-validation'
 
 const PUBLISHED_STATUS = 'published'
 
@@ -26,57 +27,26 @@ export const Projects: CollectionConfig = {
   hooks: {
     beforeChange: [
       async ({ data, originalDoc, req }) => {
-        const nextStatus = data?._status ?? originalDoc?._status
-        const nextOrder = data?.order ?? originalDoc?.order
-        const nextPreviewImage = data?.previewImage ?? originalDoc?.previewImage
-        const nextWorkType = data?.workType ?? originalDoc?.workType
-        const nextPreviewSummary = data?.previewSummary ?? originalDoc?.previewSummary
-        const nextFramingSummary = data?.framingSummary ?? originalDoc?.framingSummary
-        const nextRoleContext = data?.roleContext ?? originalDoc?.roleContext
-        const nextDecisions = data?.decisions ?? originalDoc?.decisions
-        const nextOutcome = data?.outcome ?? originalDoc?.outcome
-        const nextLearning = data?.learning ?? originalDoc?.learning
+        const mergedData = {
+          _status: data?._status ?? originalDoc?._status,
+          order: data?.order ?? originalDoc?.order,
+          previewImage: data?.previewImage ?? originalDoc?.previewImage,
+          workType: data?.workType ?? originalDoc?.workType,
+          previewSummary: data?.previewSummary ?? originalDoc?.previewSummary,
+          framingSummary: data?.framingSummary ?? originalDoc?.framingSummary,
+          roleContext: data?.roleContext ?? originalDoc?.roleContext,
+          decisions: data?.decisions ?? originalDoc?.decisions,
+          outcome: data?.outcome ?? originalDoc?.outcome,
+          learning: data?.learning ?? originalDoc?.learning,
+        }
 
-        if (nextStatus !== PUBLISHED_STATUS) {
+        const fieldErrors = validateProjectPublicationFields(mergedData)
+        if (fieldErrors.length > 0) {
+          throw new Error(fieldErrors[0])
+        }
+
+        if (mergedData._status !== PUBLISHED_STATUS) {
           return data
-        }
-
-        const errors: string[] = []
-
-        if (!nextPreviewImage) {
-          errors.push('Published projects must include a Preview Image.')
-        }
-
-        if (!nextPreviewSummary) {
-          errors.push('Published projects must include a Preview Summary.')
-        }
-
-        if (!nextFramingSummary) {
-          errors.push('Published projects must include a Framing Summary.')
-        }
-
-        if (!nextRoleContext) {
-          errors.push('Published projects must include a Role Context statement.')
-        }
-
-        if (!nextDecisions || !Array.isArray(nextDecisions) || nextDecisions.length === 0) {
-          errors.push('Published projects must include at least one decision.')
-        }
-
-        if (nextWorkType === 'shipped' && !nextOutcome) {
-          errors.push('Published shipped projects must include an Outcome.')
-        }
-
-        if (nextWorkType === 'speculative' && !nextLearning) {
-          errors.push('Published speculative projects must include a Learning section.')
-        }
-
-        if (typeof nextOrder !== 'number') {
-          errors.push('Published projects must include an Editorial Order.')
-        }
-
-        if (errors.length > 0) {
-          throw new Error(errors[0])
         }
 
         const duplicateProjects = await req.payload.find({
@@ -94,7 +64,7 @@ export const Projects: CollectionConfig = {
               },
               {
                 order: {
-                  equals: nextOrder,
+                  equals: mergedData.order,
                 },
               },
               ...(originalDoc?.id

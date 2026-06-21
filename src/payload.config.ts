@@ -12,7 +12,20 @@ import { Projects } from './collections/Projects'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+const payloadSecret = process.env.PAYLOAD_SECRET
+const databaseUrl = process.env.DATABASE_URL
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
+if (!payloadSecret) {
+  throw new Error('PAYLOAD_SECRET environment variable is required')
+}
+
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL environment variable is required')
+}
+
 export default buildConfig({
+  serverURL: siteUrl,
   admin: {
     user: Users.slug,
     importMap: {
@@ -21,15 +34,24 @@ export default buildConfig({
   },
   collections: [Users, Media, Projects],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || '',
+  secret: payloadSecret,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL || '',
+      connectionString: databaseUrl,
     },
   }),
   sharp,
   plugins: [],
+  upload: {
+    limits: {
+      fileSize: 5_000_000, // 5MB
+    },
+  },
+  cors: {
+    origins: [siteUrl],
+  },
+  csrf: [siteUrl],
 })

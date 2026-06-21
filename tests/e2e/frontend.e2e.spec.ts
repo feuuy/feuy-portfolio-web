@@ -4,11 +4,11 @@ test.describe('Frontend', () => {
   test('can go on homepage', async ({ page }) => {
     await page.goto('http://localhost:3000')
 
-    await expect(page).toHaveTitle(/FEUY Portfolio/)
+    await expect(page).toHaveTitle(/FEUY/)
     await expect(page.getByRole('banner')).toBeVisible()
     await expect(page.getByRole('navigation', { name: 'Primary' })).toBeVisible()
-    await expect(page.getByRole('heading', { level: 1, name: /designer-developer/i })).toBeVisible()
-    await expect(page.getByRole('region', { name: 'Work', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: /production-ready/i })).toBeVisible()
+    await expect(page.getByRole('region', { name: 'Case studies', exact: true })).toBeVisible()
     await expect(page.getByRole('region', { name: 'About', exact: true })).toBeVisible()
     await expect(page.getByRole('region', { name: 'Contact', exact: true })).toBeVisible()
   })
@@ -16,16 +16,17 @@ test.describe('Frontend', () => {
   test('work section renders project previews', async ({ page }) => {
     await page.goto('http://localhost:3000')
 
-    const workSection = page.getByRole('region', { name: 'Work', exact: true })
+    const workSection = page.getByRole('region', { name: 'Case studies', exact: true })
 
-    await expect(workSection.getByRole('heading', { level: 2, name: 'Work' })).toBeVisible()
+    await expect(workSection.getByRole('heading', { level: 2, name: 'Case studies' })).toBeVisible()
     await expect(workSection.getByText('Featured Projects will live here next')).not.toBeAttached()
   })
 
-  test('case study page returns 404 for missing project', async ({ page }) => {
-    const response = await page.goto('http://localhost:3000/work/99999')
+  test('case study page shows not-found for missing project', async ({ page }) => {
+    await page.goto('http://localhost:3000/work/99999')
 
-    expect(response?.status()).toBe(404)
+    await expect(page.getByRole('heading', { name: /doesn't exist/i })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Back to Home' })).toBeVisible()
   })
 
   test('case study page renders from a published project', async ({ page }) => {
@@ -52,31 +53,37 @@ test.describe('Frontend', () => {
     if (await viewCaseStudy.isVisible().catch(() => false)) {
       await viewCaseStudy.click()
 
-      await expect(page).not.toHaveTitle(/FEUY Portfolio$/)
-      await expect(page).toHaveTitle(/ — FEUY Portfolio/)
+      await expect(page).not.toHaveTitle(/^FEUY —/)
+      await expect(page).toHaveTitle(/ — FEUY$/)
     }
   })
 
   test('missing project page exposes generic not-found title', async ({ page }) => {
     await page.goto('http://localhost:3000/work/99999')
 
-    await expect(page).not.toHaveTitle(/ — FEUY Portfolio/)
+    await expect(page).toHaveTitle(/^Not Found/)
   })
 
   test.describe('homepage navigation', () => {
     test('header work link scrolls to work section', async ({ page }) => {
       await page.goto('http://localhost:3000')
 
-      await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Work' }).click()
+      await page
+        .getByRole('navigation', { name: 'Primary' })
+        .getByRole('link', { name: 'Work' })
+        .click()
 
-      const workHeading = page.getByRole('heading', { level: 2, name: 'Work' })
+      const workHeading = page.getByRole('heading', { level: 2, name: 'Case studies' })
       await expect(workHeading).toBeInViewport()
     })
 
     test('header contact link scrolls to contact section', async ({ page }) => {
       await page.goto('http://localhost:3000')
 
-      await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Contact' }).click()
+      await page
+        .getByRole('navigation', { name: 'Primary' })
+        .getByRole('link', { name: 'Contact' })
+        .click()
 
       const contactHeading = page.getByRole('heading', { level: 2, name: 'Contact' })
       await expect(contactHeading).toBeInViewport()
@@ -104,7 +111,7 @@ test.describe('Frontend', () => {
         const backLink = page.getByRole('link', { name: 'Back to Work' }).first()
         await backLink.click()
 
-        await expect(page.getByRole('heading', { level: 2, name: 'Work' })).toBeInViewport()
+        await expect(page.getByRole('heading', { level: 2, name: 'Case studies' })).toBeInViewport()
       }
     })
 

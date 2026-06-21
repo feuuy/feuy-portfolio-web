@@ -1,4 +1,4 @@
-# FEUY Portfolio
+﻿# FEUY Portfolio
 
 The FEUY Portfolio is a personal portfolio site that establishes the maker's credibility through the quality of its presentation and the clarity of its work. It exists to help visitors assess craft, trust the work, and decide whether to reach out.
 
@@ -44,6 +44,10 @@ _Avoid_: Live-ish, near-production, concept
 Speculative work is self-initiated or exploratory work that is presented honestly as not having been shipped in a real client or team context.
 _Avoid_: Hidden concept work, implied client work
 
+**Published Project**:
+A Published Project is a Project whose `_status` is `published` and that has cleared the Portfolio's Publication Rules; only Published Projects are reachable from the public homepage or case-study pages.
+_Avoid_: Draft, archived, scheduled, hidden concept work
+
 **Featured Project**:
 A Featured Project is a homepage-selected project chosen for its credibility yield rather than its chronology.
 _Avoid_: Latest project, equal-weight project
@@ -67,6 +71,14 @@ _Avoid_: Stack badge list, unsupported claims
 **Outcome / Learning**:
 Outcome is the closing proof section for shipped work, while Learning is the equivalent closing section for speculative work.
 _Avoid_: Fake impact language, implied shipped results
+
+**Closing Section**:
+The Closing Section is the case-study's final proof block. For shipped work the Closing Section is the Outcome; for speculative work it is the Learning. Exactly one of the two is required for a Published Project.
+_Avoid_: Mixed closing sections, swapped outcome/learning, no closing section
+
+**Publication Rules**:
+The Publication Rules are the field-level and ordering-level rules that gate a Project from draft to Published Project: required fields per Work Type, at least one Execution Evidence decision, and a unique Editorial Order among Published Projects.
+_Avoid_: Loose drafts, ambiguous work-type labels, duplicate editorial order
 
 **Project Preview**:
 A Project Preview is the homepage representation of a Featured Project, consisting at minimum of a title, a one-sentence framing line, a Work Type label, and a link to its Case Study.
