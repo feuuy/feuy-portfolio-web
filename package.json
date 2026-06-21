@@ -5,17 +5,19 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=8000 next build",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
+    "typecheck": "tsc --noEmit",
+    "ci": "pnpm run lint && pnpm run typecheck && pnpm run test",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
-    "seed:project": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx scripts/seed-project.ts",
-    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "seed:project": "cross-env NODE_OPTIONS=--no-deprecation --import=tsx/esm tsx scripts/seed-project.ts",
+    "start": "next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
-    "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
+    "test:e2e": "cross-env NODE_OPTIONS=--no-deprecation --import=tsx/esm playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
@@ -49,7 +51,7 @@
     "tsx": "4.21.0",
     "typescript": "5.7.3",
     "vite-tsconfig-paths": "6.0.5",
-    "vitest": "4.0.18"
+    "vitest": "4.1.9"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0",

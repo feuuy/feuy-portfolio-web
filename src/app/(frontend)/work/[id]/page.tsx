@@ -1,31 +1,10 @@
-import { getPayload } from 'payload'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 import type { Metadata } from 'next'
 
-import config from '@/payload.config'
-
-const workTypeLabels: Record<string, { value: string; label: string }> = {
-  shipped: { value: 'shipped', label: 'Shipped' },
-  speculative: { value: 'speculative', label: 'Speculative' },
-}
-
-async function getProject(id: number) {
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
-
-  try {
-    return await payload.findByID({
-      collection: 'projects',
-      id,
-      depth: 1,
-      overrideAccess: false,
-    })
-  } catch {
-    return null
-  }
-}
+import { findProjectById, getOrderedProjectIds } from '@/lib/project-repository'
+import { formatWorkType, getWorkTypeTooltip } from '../../_lib/work-type-labels'
 
 export async function generateMetadata({
   params,
@@ -33,17 +12,44 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
-  const project = await getProject(Number(id))
+  const project = await findProjectById(Number(id))
 
   if (!project) {
     return { title: 'Not Found' }
   }
 
   const description = project.previewSummary ?? project.framingSummary ?? undefined
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
   return {
-    title: `${project.title} — FEUY Portfolio`,
+    title: `${project.title} — FEUY`,
     description: description as string | undefined,
+    openGraph: {
+      title: `${project.title} — FEUY`,
+      description: description as string | undefined,
+      type: 'article',
+      url: `${baseUrl}/work/${project.id}`,
+      images: [
+        {
+          url: project.previewImage && typeof project.previewImage === 'object' && 'url' in project.previewImage
+            ? String(project.previewImage.url)
+            : `${baseUrl}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: project.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${project.title} — FEUY`,
+      description: description as string | undefined,
+      images: [
+        project.previewImage && typeof project.previewImage === 'object' && 'url' in project.previewImage
+          ? String(project.previewImage.url)
+          : `${baseUrl}/og-image.png`,
+      ],
+    },
   }
 }
 
@@ -54,30 +60,20 @@ export default async function CaseStudyPage({
 }) {
   const { id } = await params
   const numericId = Number(id)
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
 
-  const project = await getProject(numericId)
+  const project = await findProjectById(numericId)
 
   if (!project) {
     notFound()
   }
 
-  const orderedProjects = await payload.find({
-    collection: 'projects',
-    depth: 0,
-    overrideAccess: false,
-    pagination: false,
-    sort: 'order',
-  })
-
-  const orderedIds = orderedProjects.docs.map((p) => p.id)
+  const orderedIds = await getOrderedProjectIds()
   const currentIndex = orderedIds.indexOf(numericId)
   const nextProjectId = currentIndex >= 0 ? orderedIds[currentIndex + 1] : undefined
   const prevProjectId = currentIndex > 0 ? orderedIds[currentIndex - 1] : undefined
 
   const workType = project.workType as string | undefined
-  const label = workType ? (workTypeLabels[workType]?.label ?? workType) : ''
+  const label = formatWorkType(workType)
 
   const decisions = project.decisions as
     | { id?: string | null; title?: string | null; explanation?: string | null }[]
@@ -88,70 +84,33 @@ export default async function CaseStudyPage({
   const closingLabel = workType === 'shipped' ? 'Outcome' : 'Learning'
 
   return (
-    <div className="bg-architectural-white text-graphite-ink">
-      <header
-        className="sticky top-0 z-10 border-b border-line-soft bg-architectural-white/95"
-        role="banner"
-      >
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 py-4 lg:px-10">
-          <Link className="text-base font-semibold tracking-tight text-graphite-ink no-underline" href="/#top">
-            Felicio Orlandini
-          </Link>
-          <nav aria-label="Primary">
-            <ul className="flex items-center gap-4 text-sm text-lichen-muted sm:gap-6">
-              <li>
-                <Link
-                  className="no-underline transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
-                  href="/#work"
-                >
-                  Work
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="no-underline transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
-                  href="/#about"
-                >
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="no-underline transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
-                  href="/#contact"
-                >
-                  Contact
-                </Link>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </header>
-
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 pb-16 pt-8 lg:px-10 lg:pb-24">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 pb-16 pt-12 lg:px-12 lg:pb-24" id="main-content">
         <div className="max-w-3xl">
           <Link
-            className="text-sm text-lichen-muted underline decoration-line-soft underline-offset-4 transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
+            className="inline-flex items-center gap-2 text-sm text-lichen-muted underline decoration-line-soft/60 underline-offset-4 transition-colors hover:text-architectural-white focus-visible:text-architectural-white"
             href="/#work"
           >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             Back to Work
           </Link>
         </div>
 
-        <article className="grid gap-8 lg:gap-10">
-          <header className="grid gap-4 border-b border-line-soft pb-8">
+        <article className="grid gap-12 lg:gap-16">
+          <header className="grid gap-6 border-b border-line-soft/40 pb-12">
             {label && (
-              <p className="text-sm font-semibold tracking-wide text-moss-mark">{label}</p>
+              <p className="text-xs font-semibold tracking-[0.08em] uppercase text-moss-mark" title={getWorkTypeTooltip(workType)}>{label}</p>
             )}
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+            <h1 className="text-balance text-[clamp(2.5rem,5vw,4rem)] font-bold leading-[0.95] tracking-[-0.03em] text-architectural-white">
               {project.title}
             </h1>
           </header>
 
           {(project.framingSummary || project.roleContext) && (
-            <section className="max-w-3xl space-y-4">
+            <section className="max-w-3xl space-y-6">
               {project.framingSummary && (
-                <p className="text-base leading-7 text-lichen-muted">
+                <p className="text-lg leading-[1.6] text-architectural-white">
                   {project.framingSummary as string}
                 </p>
               )}
@@ -164,17 +123,17 @@ export default async function CaseStudyPage({
           )}
 
           {decisions && decisions.length > 0 && (
-            <section className="grid gap-8">
+            <section className="grid gap-6">
               {decisions.map((decision, idx) => (
                 <div
                   key={decision.id ?? idx}
-                  className="rounded-lg border border-line-soft bg-mist-surface p-6 lg:p-8"
+                  className="rounded-2xl border border-line-soft/40 bg-mist-surface/50 p-6 lg:p-8"
                 >
-                  <h2 className="text-lg font-semibold tracking-tight text-graphite-ink">
+                  <h2 className="text-balance text-xl font-semibold tracking-tight text-architectural-white">
                     {decision.title ?? ''}
                   </h2>
                   {decision.explanation && (
-                    <p className="mt-3 text-base leading-7 text-lichen-muted">
+                    <p className="mt-4 text-base leading-[1.6] text-lichen-muted">
                       {decision.explanation}
                     </p>
                   )}
@@ -184,49 +143,55 @@ export default async function CaseStudyPage({
           )}
 
           {closingContent && (
-            <section className="max-w-3xl rounded-lg border border-line-soft bg-mist-surface p-6 lg:p-8">
-              <h2 className="text-lg font-semibold tracking-tight text-graphite-ink">
+            <section className="max-w-3xl rounded-2xl border border-line-soft/40 bg-mist-surface/50 p-6 lg:p-8">
+              <h2 className="text-balance text-xl font-semibold tracking-tight text-architectural-white">
                 {closingLabel}
               </h2>
-              <p className="mt-3 text-base leading-7 text-lichen-muted">{closingContent}</p>
+              <p className="mt-4 text-base leading-[1.6] text-lichen-muted">{closingContent}</p>
             </section>
           )}
 
-          <div className="max-w-3xl pt-4">
-            <p className="text-base leading-7 text-lichen-muted">
+          <div className="max-w-3xl pt-8">
+            <p className="text-lg leading-[1.6] text-architectural-white">
               Start a conversation about product work, design, or frontend implementation.
             </p>
             <Link
-              className="mt-3 inline-block text-base font-semibold text-graphite-ink underline decoration-line-soft underline-offset-4 transition-colors hover:text-moss-mark focus-visible:text-moss-mark"
+              className="mt-4 inline-flex items-center gap-2 text-base font-semibold text-architectural-white no-underline transition-colors hover:text-moss-mark focus-visible:text-moss-mark"
               href="/#contact"
             >
               Get in touch
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </Link>
           </div>
         </article>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-line-soft pt-6 text-sm text-lichen-muted">
+        <div className="flex flex-wrap items-center justify-between gap-6 border-t border-line-soft/40 pt-8 text-sm text-lichen-muted">
           <div className="flex items-center gap-4">
             {prevProjectId ? (
               <Link
-                className="underline decoration-line-soft underline-offset-4 transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
+                className="inline-flex items-center gap-2 underline decoration-line-soft/60 underline-offset-4 transition-colors hover:text-architectural-white focus-visible:text-architectural-white"
                 href={`/work/${prevProjectId}`}
               >
-                Previous project
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Previous
               </Link>
             ) : (
-              <span className="text-lichen-muted/50">Previous project</span>
+              <span className="text-lichen-muted/50">Previous</span>
             )}
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <Link
-              className="underline decoration-line-soft underline-offset-4 transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
+              className="underline decoration-line-soft/60 underline-offset-4 transition-colors hover:text-architectural-white focus-visible:text-architectural-white"
               href="/#work"
             >
-              Back to Work
+              All work
             </Link>
             <Link
-              className="underline decoration-line-soft underline-offset-4 transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
+              className="underline decoration-line-soft/60 underline-offset-4 transition-colors hover:text-architectural-white focus-visible:text-architectural-white"
               href="/#contact"
             >
               Contact
@@ -235,59 +200,19 @@ export default async function CaseStudyPage({
           <div className="flex items-center gap-4">
             {nextProjectId ? (
               <Link
-                className="underline decoration-line-soft underline-offset-4 transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
+                className="inline-flex items-center gap-2 underline decoration-line-soft/60 underline-offset-4 transition-colors hover:text-architectural-white focus-visible:text-architectural-white"
                 href={`/work/${nextProjectId}`}
               >
-                Next project
+                Next
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </Link>
             ) : (
-              <span className="text-lichen-muted/50">Next project</span>
+              <span className="text-lichen-muted/50">Next</span>
             )}
           </div>
         </div>
       </main>
-
-      <footer
-        aria-labelledby="contact-heading"
-        className="mx-auto flex w-full max-w-6xl flex-col gap-4 border-t border-line-soft px-6 py-8 text-sm text-lichen-muted lg:px-10"
-        role="contentinfo"
-      >
-        <nav aria-label="Footer">
-          <ul className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <li>
-              <Link
-                className="no-underline transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
-                href="/#work"
-              >
-                Work
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="no-underline transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
-                href="/#about"
-              >
-                About
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="no-underline transition-colors hover:text-graphite-ink focus-visible:text-graphite-ink"
-                href="/#contact"
-              >
-                Contact
-              </Link>
-            </li>
-          </ul>
-        </nav>
-        <a
-          className="w-fit font-semibold text-graphite-ink underline decoration-line-soft underline-offset-4 transition-colors hover:text-moss-mark focus-visible:text-moss-mark"
-          href={`mailto:${process.env.CONTACT_EMAIL ?? 'hello@example.com'}`}
-        >
-          {process.env.CONTACT_EMAIL ?? 'hello@example.com'}
-        </a>
-        <p className="m-0 text-sm text-lichen-muted">© 2026 Felicio Orlandini</p>
-      </footer>
-    </div>
   )
 }
